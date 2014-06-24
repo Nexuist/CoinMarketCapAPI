@@ -26,7 +26,7 @@ var APIServer = function() {
         });
         process.on("exit", function() { self.stop(); });
     };
-    
+
     self.start = function() {
         //  Start the app on the specific interface (and port)
         self.app.listen(self.port, self.ipaddress, function() {
@@ -34,7 +34,7 @@ var APIServer = function() {
                         Date(Date.now()), self.ipaddress, self.port);
         });
     };
-    
+
     self.stop = function(sig) {
         if (typeof sig === "string") {
            console.log("%s: Received %s - terminating app.",
@@ -52,21 +52,50 @@ var APIServer = function() {
 
 	self.APIRequest = function (req, res) {
 		dataDir = process.env.OPENSHIFT_DATA_DIR + "/cache/";
-		currency = req.path.substring(5).toLowerCase();
+		query = req.path.substring(5).toLowerCase();
+		slashLocation = query.indexOf("/");
+		if (slashLocation > -1) {
+			// Property was requested
+			property = query.substring(slashLocation + 1);
+			symbol = query.substring(0, slashLocation);
+		} else {
+			property = null;
+			symbol = query;
+		}
 		res.setHeader("Content-Type", "application/json");
-		fs.readFile(dataDir + currency + ".json", function (error, data) {
-			if (error) {
-				res.send({"error": "Currency not found"});
-				return;
-			} 
-			res.send(data);
+		// Allows cross domain access
+		res.header("Access-Control-Allow-Origin", "*");
+  	res.header("Access-Control-Allow-Headers", "X-Requested-With");
+		self.coinData(symbol, property, function (result) {
+			res.send(result);
 		});
-		
 	}
-}; 
+
+	self.coinData = function(symbol, property, callback) {
+		dataDir = process.env.OPENSHIFT_DATA_DIR + "/cache/";
+		fs.readFile(dataDir + symbol + ".json", function (error, data) {
+			if (error) {
+				// Most likely, file doesn't exist
+				callback({"error": "Currency not found"});
+				return;
+			}
+			data = JSON.parse(data);
+			if (property) {
+				if (!data.hasOwnProperty(property)) {
+					// Property doesn't exist
+					callback({"error": "Invalid property requested"});
+					return;
+				}
+				callback(data[property]);
+			}
+			else {
+				callback(data);
+			}
+		});
+	}
+};
 
 
 var server = new APIServer();
 server.initialize();
 server.start();
-

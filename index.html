@@ -4,7 +4,7 @@
 	  <meta charset="utf-8">
 	  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	  <title>CoinMarketCap JSON API</title>
-	
+
 	<link href="//fonts.googleapis.com/css?family=Roboto:100italic,100,300italic,300,400italic,400,500italic,500,700italic,700,900italic,900" rel="stylesheet" type="text/css">
 	<style>
 
@@ -49,11 +49,11 @@
 	  -ms-text-size-adjust: 100%;
 	  -webkit-text-size-adjust: 100%;
 	}
-	
+
 	ul {
 		margin-top: 0;
 	}
-	
+
 	.container {
 	  margin-right: auto;
 	  margin-left: auto;
@@ -222,40 +222,14 @@
 						<li><a href = "/api/doge">/api/doge</a> (Dogecoin)</li>
 						<li><a href = "/api/all">/api/all</a> (All supported currencies)</li>
 					</ul>
-					<h2>Example Output</h2>
-					<pre>
-{
-	"symbol":"btc",
-	"position":"1",
-	"marketCap": {
-		"usd":"6051301788",
-		"eur":"4386788359",
-		"cny":"37516703489",
-		"cad":"6677744651",
-		"rub":"212535878830",
-		"btc":"12591525"
-	},
-	"price": {
-		"usd":"480.59",
-		"eur":"348.39",
-		"cny":"2980",
-		"cad":"530.34",
-		"rub":"16879",
-		"btc":"1.00"
-		},
-	"supply":"12591525",
-	"volume": {
-		"usd":"34067291",
-		"eur":"24696504",
-		"cny":"211209508",
-		"cad":"37594006",
-		"rub":"1196522994",
-		"btc":"70887"
-		},
-	"change":"+4.08"
-	"timestamp":"1396404252318"
-}
-					</pre>
+					<h2>Property Isolation</h2>
+					<p>If you want to only get a single property of a currency, you can add it to the URL after the currency code:</p>
+					<ul>
+						<li><a href = "/api/btc/price">/api/btc/price</a> (Bitcoin prices)</li>
+						<li><a href = "/api/ltc/market_cap">/api/ltc/market_cap</a> (Litecoin market cap)</li>
+						<li><a href = "/api/doge/volume">/api/doge/volume</a> (Dogecoin volume)</li>
+						<li><a href = "/api/ppc/change">/api/ppc/change</a> (Peercoin price change since last check)</li>
+					</ul>
 					<h2>Donations</h2>
 					<ul style = "list-style-type:none">
 						<li><a href = "bitcoin:1N7NPHD8ewczMaM2RWFnxwSZwyLb33Kz1G">Bitcoin</a>: 1N7NPHD8ewczMaM2RWFnxwSZwyLb33Kz1G</li>

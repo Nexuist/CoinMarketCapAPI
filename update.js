@@ -3,6 +3,7 @@ var request = require("request");
 var cheerio = require("cheerio");
 var fs = require("fs");
 
+var currencies = ["usd", "eur", "cny", "cad", "rub", "btc"];
 var data = {};
 
 request('http://coinmarketcap.com', function (error, response, body) {
@@ -10,56 +11,47 @@ request('http://coinmarketcap.com', function (error, response, body) {
     $ = cheerio.load(body);
     // Go through every currency
     $("tr").each(function (i) {
-    	var symbol = $(this).attr("id");
     	// When index is 0 it gets passed a nonexistent tr for some reason
     	// wtf!?
     	if (i > 0) {
+        var symbol = $(this).attr("id").substring(3); // ex. id-btc gets turned into btc
     		var td = $(this).find("td");
-			var position = td.eq(0).text().trim();
-			var name = td.eq(1).text().trim();
-			var marketCap = {"usd": extractCurrency(td.eq(2), "usd"),
-				"eur": extractCurrency(td.eq(2), "eur"),
-				"cny": extractCurrency(td.eq(2), "cny"),
-				"cad": extractCurrency(td.eq(2), "cad"),
-				"rub": extractCurrency(td.eq(2), "rub"),
-				"btc": extractCurrency(td.eq(2), "btc")};	
-			var price = {"usd": extractCurrency(td.eq(3).find("a").eq(0), "usd"),
-				"eur": extractCurrency(td.eq(3).find("a").eq(0), "eur"),
-				"cny": extractCurrency(td.eq(3).find("a").eq(0), "cny"),
-				"cad": extractCurrency(td.eq(3).find("a").eq(0), "cad"),
-				"rub": extractCurrency(td.eq(3).find("a").eq(0), "rub"),
-				"btc": extractCurrency(td.eq(3).find("a").eq(0), "btc")};	
-			var supply = td.eq(4).text().replace(/\D/g, "").trim(); // Replace all non digit characters with null
-			var volume = {"usd": extractCurrency(td.eq(5).find("a").eq(0), "usd"),
-				"eur": extractCurrency(td.eq(5).find("a").eq(0), "eur"),
-				"cny": extractCurrency(td.eq(5).find("a").eq(0), "cny"),
-				"cad": extractCurrency(td.eq(5).find("a").eq(0), "cad"),
-				"rub": extractCurrency(td.eq(5).find("a").eq(0), "rub"),
-				"btc": extractCurrency(td.eq(5).find("a").eq(0), "btc")};	
-			var change = td.eq(6).text().replace("%", "").trim();
-			var timestamp = (new Date).getTime(); // Seconds since unix epoch
-			data[name] = {"symbol": symbol,
-				"position": position,
-				"marketCap": marketCap,
-				"price": price,
-				"supply": supply,
-				"volume": volume, 
-				"change": change,
-				"timestamp": timestamp};
-		}
+  			var position = td.eq(0).text().trim();
+  			var name = td.eq(1).text().trim();
+  			var marketCap = currencyDictionary(td.eq(2));
+        var price = currencyDictionary(td.eq(3).find("a").eq(0));
+  			var supply = td.eq(4).text().replace(/\D/g, "").trim(); // Replace all non digit characters with nothing
+  			var volume = currencyDictionary(td.eq(5).find("a").eq(0));
+  			var change = td.eq(6).text().replace("%", "").trim();
+  			var timestamp = Date.now() / 1000; // Seconds since unix epoch
+  			data[name] = {
+          "symbol": symbol,
+  				"position": position,
+  				"market_cap": marketCap,
+  				"price": price,
+  				"supply": supply,
+  				"volume": volume,
+  				"change": change,
+  				"timestamp": timestamp};
+		  }
     });
-    writeData();   
+    writeData();
   }
 });
 
-function extractCurrency(item, currency) {
-	return item.data(currency).toString().replace(/,/g,""); // Regular expression to remove all commas
+function currencyDictionary(item) {
+  // Iterate through currencies and fill the values in with the given item
+  var result = {};
+  for (var index in currencies) {
+    currency = currencies[index]; // Have to do this because for..in gives the index and not the item
+    result[currency] = item.data(currency).toString().replace(/,/g,""); // Regular expression to remove all commas
+  }
+  return result;
 }
-
 
 function writeData() {
 	dataDir = process.env.OPENSHIFT_DATA_DIR + "/cache/";
-	callback = function(error) { 
+	callback = function(error) {
 		if (error) {
 			console.log(error);
 		}
