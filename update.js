@@ -4,11 +4,13 @@ var cheerio = require("cheerio");
 var fs = require("fs");
 
 var currencies = ["usd", "eur", "cny", "cad", "rub", "btc"];
+var currencyExchangeRates = Array();
 var data = {};
 
 request('http://coinmarketcap.com', function (error, response, body) {
   if (!error && response.statusCode == 200) {
     $ = cheerio.load(body);
+    currencyExchangeRates = $("#currency-exchange-rates").data();
     // Go through every currency
     $("tr").each(function (i) {
     	// When index is 0 it gets passed a nonexistent tr for some reason
@@ -18,6 +20,9 @@ request('http://coinmarketcap.com', function (error, response, body) {
     		var td = $(this).find("td");
   			var position = td.eq(0).text().trim();
   			var name = td.eq(1).text().trim();
+        var re = /\s([a-z]|[0-9])+\s/i;
+        var supplyText = td.eq(4).text();
+        var symbol = supplyText.match(re)[0].trim().toLowerCase(); // Use regex to get the symbol at the end of the supply td
   			var marketCap = currencyDictionary(td.eq(2));
         var price = currencyDictionary(td.eq(3).find("a").eq(0));
   			var supply = td.eq(4).text().replace(/\D/g, "").trim(); // Replace all non digit characters with nothing
@@ -41,22 +46,31 @@ request('http://coinmarketcap.com', function (error, response, body) {
 
 function currencyDictionary(item) {
   // Iterate through currencies and fill the values in with the given item
-  var result = {};
-  for (var index in currencies) {
-    currency = currencies[index]; // Have to do this because for..in gives the index and not the item
-    result[currency] = item.data(currency).toString().replace(/,/g,""); // Regular expression to remove all commas
-  }
-  return result;
+  var resultArray = {};
+  currencies.forEach(function(currency) {
+    if (currency == "btc") {
+      var result = item.data("btc");
+    }
+    else {
+      // Grab the value in USD and divide by the currency exchange rate for the specific currency to get the value in that currency
+      var result = item.data("usd") / currencyExchangeRates[currency];
+    }
+    resultArray[currency] = result.toString().replace(/,/g,"");
+  });
+  return resultArray;
 }
 
 function writeData() {
-	dataDir = process.env.OPENSHIFT_DATA_DIR + "/cache/";
+	dataDir = process.env.OPENSHIFT_DATA_DIR + "cache/";
+  if (typeof process.env.OPENSHIFT_DATA_DIR === "undefined")
+    dataDir = "cache/"; // Running locally
 	callback = function(error) {
 		if (error) {
 			console.log(error);
 		}
 	};
 	for (currency in data) {
+    // Currency is a string, so use it to get the array filled with info
 		info = data[currency];
 		fileName = dataDir + info["symbol"] + ".json";
 		fs.writeFile(fileName, JSON.stringify(info), callback);

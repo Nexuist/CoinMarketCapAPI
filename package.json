@@ -1,6 +1,6 @@
 {
   "name": "coinmarketcap",
-  "version": "0.0.1",
+  "version": "0.5.1",
   "description": "JSON API for coinmarketcap.",
   "main": "server.js",
   "dependencies": {
