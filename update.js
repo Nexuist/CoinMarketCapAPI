@@ -7,7 +7,7 @@ var currencies = ["usd", "eur", "cny", "cad", "rub", "btc"];
 var currencyExchangeRates = Array();
 var data = {};
 
-request('http://coinmarketcap.com', function (error, response, body) {
+request('http://coinmarketcap.com/all/views/all/', function (error, response, body) {
   if (!error && response.statusCode == 200) {
     $ = cheerio.load(body);
     currencyExchangeRates = $("#currency-exchange-rates").data();
