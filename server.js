@@ -72,6 +72,10 @@ module.exports = class Server {
       res.send({"error": "This isn't an endpoint!"})
       return
     }
+    if (query == "all") {
+      res.send(self.api.coins)
+      return
+    }
     var slashLocation = query.indexOf("/")
     var queryContainsProperty = (slashLocation > -1) // i.e. /api/btc/market_cap
     if (queryContainsProperty) {
