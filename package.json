@@ -1,6 +1,5 @@
 {
   "name": "coinmarketcap",
-<<<<<<< HEAD
   "version": "2.0.1",
   "description": "JSON API for coinmarketcap.com.",
   "main": "main.js",
@@ -18,4 +17,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Nexuist/CoinMarketCapAP
+    "url": "https://github.com/Nexuist/CoinMarketCapAPI.git"
+  }
+}

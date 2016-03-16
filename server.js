@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 "use strict";
 
 var restify = require("restify")
@@ -125,4 +124,6 @@ module.exports = class Server {
     // Server stopped
     clearInterval(self.APIRefreshHandler)
     self.log("Server stopped with event: " + event + ". Last metrics: " + JSON.stringify(this.metrics))
-    process.e
+    process.exit(1)
+  }
+}
