@@ -12,6 +12,7 @@ module.exports = class Server {
     this.api = new CoinAPI()
     self.metrics = {
       "requestsServed": 0,
+      "requestsServedBeforeLastUpdate": 17299258,
       "startTime": 0,
       "indexVisits": 0,
       "lastSuccessfulRefresh": 0
