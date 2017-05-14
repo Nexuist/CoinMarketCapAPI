@@ -59,7 +59,7 @@ module.exports = class Server {
       self.log("Server started.")
     })
   }
-  trackEvent(category, action) {
+  trackEvent(category, action, value) {
     if (!self.trackingID) return
     // https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
     request.post("https://www.google-analytics.com/collect").form({
@@ -68,8 +68,9 @@ module.exports = class Server {
       tid: self.trackingID,
       uid: "server",
       ec: category,
-      ea: action
-    });
+      ea: action,
+      ev: value
+    })
   }
   log(msg, isSevere) {
     console.log("%s: %s", Date(Date.now()), msg)
@@ -79,7 +80,7 @@ module.exports = class Server {
     var property = null
     var result = null
     var query = req.path().substring(5).toLowerCase()
-    self.trackEvent("API", query)
+    self.trackEvent("Request", query)
     if (query == "") {
       res.send({"error": "This isn't an endpoint!"})
       return
@@ -124,10 +125,14 @@ module.exports = class Server {
       var success = (numCoinsUpdated == 100)
       var isSevere = !success
       self.log("Updated " + numCoinsUpdated + " coins. Success: " + success, isSevere)
+      self.trackEvent("Update", success ? "Success" : "Failure", numCoinsUpdated)
       if (success) {
         self.metrics.lastSuccessfulRefresh = Date(Date.now())
         self.metrics.coins = numCoinsUpdated
       }
+    }, function(error, statusCode) {
+      console.log("Error while refreshing API", error, "with status code", statusCode)
+      self.trackEvent("Update", "Error", statusCode)
     })
   }
   handleMetricsRequest(req, res, next) {
