@@ -1,14 +1,16 @@
 "use strict";
 
 var restify = require("restify")
+var request = require("request")
 var CoinAPI = require("./lib/CoinAPI")
 var self = null
 
 module.exports = class Server {
-  constructor(address, port) {
+  constructor(address, port, trackingID) {
     self = this
     self.address = address
     self.port = port
+    self.trackingID = trackingID
     this.api = new CoinAPI()
     self.metrics = {
       "startTime": 0,
@@ -57,6 +59,18 @@ module.exports = class Server {
       self.log("Server started.")
     })
   }
+  trackEvent(category, action) {
+    if (!self.trackingID) return
+    // https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
+    request.post("https://www.google-analytics.com/collect").form({
+      v: 1,
+      t: "event", 
+      tid: self.trackingID,
+      uid: "server",
+      ec: category,
+      ea: action
+    });
+  }
   log(msg, isSevere) {
     console.log("%s: %s", Date(Date.now()), msg)
   }
@@ -65,6 +79,7 @@ module.exports = class Server {
     var property = null
     var result = null
     var query = req.path().substring(5).toLowerCase()
+    self.trackEvent("API", query)
     if (query == "") {
       res.send({"error": "This isn't an endpoint!"})
       return
