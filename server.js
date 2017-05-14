@@ -11,11 +11,9 @@ module.exports = class Server {
     self.port = port
     this.api = new CoinAPI()
     self.metrics = {
-      "requestsServed": 0,
-      "requestsServedBeforeLastUpdate": 17299258,
       "startTime": 0,
-      "indexVisits": 0,
-      "lastSuccessfulRefresh": 0
+      "lastSuccessfulRefresh": 0,
+      "coins": 0
     }
     self.app = restify.createServer({
       "name": "CoinmarketCap API Server"
@@ -37,7 +35,6 @@ module.exports = class Server {
     }))
     /* Serve index file */
     self.app.get("/", function (req, res, next) {
-      self.metrics.indexVisits++
       next()
     },
     restify.serveStatic({
@@ -64,7 +61,6 @@ module.exports = class Server {
     console.log("%s: %s", Date(Date.now()), msg)
   }
   handleAPIRequest(req, res, next) {
-    self.metrics.requestsServed++
     var coin = null
     var property = null
     var result = null
@@ -115,6 +111,7 @@ module.exports = class Server {
       self.log("Updated " + numCoinsUpdated + " coins. Success: " + success, isSevere)
       if (success) {
         self.metrics.lastSuccessfulRefresh = Date(Date.now())
+        self.metrics.coins = numCoinsUpdated
       }
     })
   }
