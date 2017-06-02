@@ -12,9 +12,10 @@
   "license": "MIT",
   "dependencies": {
     "cheerio": "^0.20.0",
+    "mongodb": "^2.1.16",
+    "nodemailer": "^4.0.1",
     "request": "^2.69.0",
-    "restify": "^4.0.4",
-    "mongodb": "^2.1.16"
+    "restify": "^4.0.4"
   },
   "repository": {
     "type": "git",
