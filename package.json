@@ -13,7 +13,8 @@
   "dependencies": {
     "cheerio": "^0.20.0",
     "request": "^2.69.0",
-    "restify": "^4.0.4"
+    "restify": "^4.0.4",
+    "mongodb": "^2.1.16"
   },
   "repository": {
     "type": "git",
