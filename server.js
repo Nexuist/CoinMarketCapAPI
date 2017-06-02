@@ -53,7 +53,7 @@ module.exports = class Server {
     self.handleAPIRefresh()
   }
   start() {
-    self.app.listen(self.port, self.address, function() {
+    self.app.listen(self.port, function() {
       // Server started
       self.metrics.startTime = Date(Date.now())
       self.log("Server started.")
