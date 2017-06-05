@@ -2,6 +2,17 @@
 
 var restify = require("restify")
 var request = require("request")
+
+var Rollbar = require('rollbar');
+var rollbar = new Rollbar({
+    accessToken: process.env.ROLLBAR_KEY,
+    handleUncaughtExceptions: true,
+    handleUnhandledRejections: true,
+    payload: {
+      environment: process.env.ENVIRONMENT
+    }
+});
+
 var CoinAPI = require("./lib/CoinAPI")
 var self = null
 
@@ -35,6 +46,9 @@ module.exports = class Server {
       rate: 50, // requests/second
       ip: true
     }))
+
+    self.app.use(rollbar.errorHandler());
+
     /* Serve index file */
     self.app.get("/", function (req, res, next) {
       next()
