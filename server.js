@@ -79,6 +79,9 @@ module.exports = class Server {
     var coin = null
     var property = null
     var result = null
+    res.setHeader("Content-Type", "application/json")
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Headers", "X-Requested-With")
     var query = req.path().substring(5).toLowerCase()
     self.trackEvent("Request", query)
     if (query == "") {
@@ -115,9 +118,6 @@ module.exports = class Server {
     else {
       result = {"error": "Requested coin does not exist or has not been updated yet."}
     }
-    res.setHeader("Content-Type", "application/json")
-    res.header("Access-Control-Allow-Origin", "*")
-    res.header("Access-Control-Allow-Headers", "X-Requested-With")
     res.send(result)
   }
   handleAPIRefresh() {
