@@ -1,0 +1,1 @@
+2.0.7   repaired 'symbol' and 'name'; CMC had probably changed layout 
