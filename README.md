@@ -4,7 +4,16 @@ JSON API for coinmarketcap.com hosted on OpenShift. The documentation for this s
 
 The service itself is hosted by me at https://coinmarketcap-nexuist.rhcloud.com/. You can use that site or, if you want, host it yourself.
 
-To run, `npm install && npm start`.
+To run, 
+
+```
+npm install
+npm start
+```
+
+### Version 2.0.9 (altsheets)
+* CMC had changed separator from " " to "\n" - fixed
+* several previous updates, see [commit history](https://github.com/altsheets/CoinMarketCapAPI/commits/master)
 
 ### New in 2.0
 
